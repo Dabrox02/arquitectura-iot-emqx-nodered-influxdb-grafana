@@ -1,0 +1,38 @@
+// Dashboard Bar Auges - States
+// Contar "No detected"
+noDetectedCount = from(bucket: "bucket-mq2")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "state")
+  |> filter(fn: (r) => r["_field"] == "value")
+  |> filter(fn: (r) => r["_value"] == "No detected")
+  |> count()
+  |> map(fn: (r) => ({ r with value: "No detected", count: r._value }))
+  |> keep(columns: ["value", "count"])
+
+// Contar "Detected"
+detectedCount = from(bucket: "bucket-mq2")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "state")
+  |> filter(fn: (r) => r["_field"] == "value")
+  |> filter(fn: (r) => r["_value"] == "Detected")
+  |> count()
+  |> map(fn: (r) => ({ r with value: "Detected", count: r._value }))
+  |> keep(columns: ["value", "count"])
+
+// Unir los resultados
+union(tables: [noDetectedCount, detectedCount])
+  |> yield(name: "counts")
+
+
+
+////////////////////////////////////////////////
+// Dashboard Time Serie - Value States
+from(bucket: "bucket-mq2")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "value-state")
+  |> filter(fn: (r) => r["_field"] == "value")
+  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)
+  |> yield(name: "mean")
+
+
+

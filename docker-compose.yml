@@ -1,0 +1,60 @@
+version: '3'
+services:
+  influxdb2:
+    container_name: influxdb-mq2
+    image: influxdb:2
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin-mq2
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin123
+      DOCKER_INFLUXDB_INIT_ORG: uts-iot
+      DOCKER_INFLUXDB_INIT_BUCKET: bucket-mq2
+  grafana:
+    container_name: grafana-mq2
+    image: grafana/grafana-oss
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin-mq2
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+  nodered:
+    container_name: nodered-mq2
+    image: nodered/node-red
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered_data:/data
+  emqx:
+    image: emqx/emqx:5.6.1
+    container_name: emqx-mq2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "8084:8084"
+      - "8883:8883"
+      - "18083:18083"
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+    environment:
+      EMQX_DASHBOARD__DEFAULT_USER__LOGIN: admin-mq2
+      EMQX_DASHBOARD__DEFAULT_USER__PASSWORD: admin123
+
+volumes:
+  nodered_data:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:
+  emqx_data:
+  emqx_log:
