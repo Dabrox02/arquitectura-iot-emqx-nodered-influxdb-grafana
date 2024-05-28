@@ -4,8 +4,8 @@
 const int GAS_PIN = 32; // Pin analógico para el sensor de gas
 const int BUZZER_PIN = 12;
 const int LED_PIN = 14;
-const char* ssid = "xxxxxxxxxxxxx";
-const char* password = "xxxxxxxxxxxxx";
+const char* ssid = "9JS";
+const char* password = "lol123456";
 const char* mqtt_server = "172.191.237.33"; // TODO: Cambiar IP Servidor 
 
 WiFiClient espClient;
@@ -48,7 +48,7 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str())) {
       Serial.println("Connected");
-      client.publish("uts-iot/mqtt-jaider/gas-detection", "Welcome ESP32 to Gas Detection");
+      // client.publish("uts-iot/mqtt-jaider/gas-detection", "Welcome ESP32 to Gas Detection");
       client.subscribe("uts-iot/mqtt-jaider/gas-detection");
     } else {
       Serial.print("failed, rc=");
